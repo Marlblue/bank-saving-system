@@ -67,6 +67,20 @@ app.get('/api/dashboard', (req, res) => {
   }
 });
 
+// In production, serve the frontend build as static files
+const path = require('path');
+const frontendBuildPath = path.resolve(__dirname, '../frontend/dist');
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(frontendBuildPath));
+
+  // SPA fallback — serve index.html for all non-API routes
+  app.get('*', (req, res) => {
+    if (!req.path.startsWith('/api')) {
+      res.sendFile(path.join(frontendBuildPath, 'index.html'));
+    }
+  });
+}
+
 // Global error handler
 app.use(errorHandler);
 

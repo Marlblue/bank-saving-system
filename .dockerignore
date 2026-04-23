@@ -1,0 +1,9 @@
+node_modules
+.git
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+.env
+backend/node_modules
+frontend/node_modules
+frontend/dist
