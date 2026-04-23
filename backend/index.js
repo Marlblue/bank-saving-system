@@ -71,10 +71,11 @@ app.get('/api/dashboard', (req, res) => {
 app.use(errorHandler);
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`\n🏦 Bank Saving System API running on http://localhost:${PORT}`);
-  console.log(`📚 API Documentation: http://localhost:${PORT}/api-docs`);
-  console.log(`🔍 Health Check: http://localhost:${PORT}/api/health\n`);
+const HOST = process.env.HOST || '0.0.0.0';
+app.listen(PORT, HOST, () => {
+  console.log(`\n🏦 Bank Saving System API running on http://${HOST}:${PORT}`);
+  console.log(`📚 API Documentation: http://${HOST}:${PORT}/api-docs`);
+  console.log(`🔍 Health Check: http://${HOST}:${PORT}/api/health\n`);
 });
 
 module.exports = app;
