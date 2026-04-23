@@ -1,28 +1,11 @@
-import { useState, useEffect } from 'react';
-import dashboardService from '../services/dashboardService';
+import useDashboard from '../hooks/useDashboard';
 import { HiUsers, HiCreditCard, HiCash, HiCollection } from 'react-icons/hi';
 import { formatCurrency, formatDate } from '../utils/formatters';
 import { useNavigate } from 'react-router-dom';
 
 export default function Dashboard() {
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { stats, loading } = useDashboard();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    loadStats();
-  }, []);
-
-  const loadStats = async () => {
-    try {
-      const res = await dashboardService.getStats();
-      setStats(res.data);
-    } catch (err) {
-      console.error('Failed to load dashboard:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (loading) {
     return (

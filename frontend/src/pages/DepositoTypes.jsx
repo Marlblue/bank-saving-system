@@ -1,91 +1,31 @@
-import { useState, useEffect } from 'react';
-import depositoTypeService from '../services/depositoTypeService';
 import { useToast } from '../components/common/Toast';
 import Modal from '../components/common/Modal';
 import ConfirmDialog from '../components/common/ConfirmDialog';
 import { formatDateTime } from '../utils/formatters';
 import { HiPlus, HiPencil, HiTrash } from 'react-icons/hi';
+import useDepositoTypes from '../hooks/useDepositoTypes';
 
 export default function DepositoTypes() {
-  const [types, setTypes] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editing, setEditing] = useState(null);
-  const [formName, setFormName] = useState('');
-  const [formReturn, setFormReturn] = useState('');
-  const [saving, setSaving] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState(null);
-  const [deleting, setDeleting] = useState(false);
   const toast = useToast();
-
-  useEffect(() => {
-    loadTypes();
-  }, []);
-
-  const loadTypes = async () => {
-    try {
-      const res = await depositoTypeService.getAll();
-      setTypes(res.data);
-    } catch (err) {
-      toast(err.message, 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const openCreateModal = () => {
-    setEditing(null);
-    setFormName('');
-    setFormReturn('');
-    setModalOpen(true);
-  };
-
-  const openEditModal = (type) => {
-    setEditing(type);
-    setFormName(type.name);
-    setFormReturn(type.yearly_return.toString());
-    setModalOpen(true);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!formName.trim()) { toast('Name is required', 'error'); return; }
-    if (!formReturn || isNaN(formReturn) || parseFloat(formReturn) <= 0) {
-      toast('Yearly return must be a positive number', 'error'); return;
-    }
-    setSaving(true);
-    try {
-      const data = { name: formName.trim(), yearly_return: parseFloat(formReturn) };
-      if (editing) {
-        await depositoTypeService.update(editing.id, data);
-        toast('Deposito type updated successfully', 'success');
-      } else {
-        await depositoTypeService.create(data);
-        toast('Deposito type created successfully', 'success');
-      }
-      setModalOpen(false);
-      loadTypes();
-    } catch (err) {
-      toast(err.message, 'error');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!deleteTarget) return;
-    setDeleting(true);
-    try {
-      await depositoTypeService.delete(deleteTarget.id);
-      toast('Deposito type deleted successfully', 'success');
-      setDeleteTarget(null);
-      loadTypes();
-    } catch (err) {
-      toast(err.message, 'error');
-    } finally {
-      setDeleting(false);
-    }
-  };
+  const {
+    types,
+    loading,
+    modalOpen,
+    editing,
+    formName,
+    setFormName,
+    formReturn,
+    setFormReturn,
+    saving,
+    deleteTarget,
+    setDeleteTarget,
+    deleting,
+    openCreateModal,
+    openEditModal,
+    closeModal,
+    handleSubmit,
+    handleDelete,
+  } = useDepositoTypes(toast);
 
   const tierColors = {
     'bronze': 'badge-amber',
@@ -166,11 +106,11 @@ export default function DepositoTypes() {
       {/* Create/Edit Modal */}
       <Modal
         isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
+        onClose={closeModal}
         title={editing ? 'Edit Deposito Type' : 'Create Deposito Type'}
         footer={
           <>
-            <button className="btn btn-secondary" onClick={() => setModalOpen(false)} disabled={saving}>Cancel</button>
+            <button className="btn btn-secondary" onClick={closeModal} disabled={saving}>Cancel</button>
             <button className="btn btn-primary" onClick={handleSubmit} disabled={saving}>
               {saving ? 'Saving...' : editing ? 'Update' : 'Create'}
             </button>

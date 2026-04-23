@@ -35,8 +35,8 @@ Backend MVC:
 
 Frontend MVC:
 ├── Models      → API services (HTTP calls)
-├── Controllers → Custom React hooks
-└── Views       → React components (JSX)
+├── Controllers → Custom React hooks (useCustomers, useAccounts, etc.)
+└── Views       → React components (JSX pages)
 ```
 
 ## 🚀 Getting Started
@@ -47,7 +47,7 @@ Frontend MVC:
 
 ### 1. Clone the repository
 ```bash
-git clone https://gitlab.com/YOUR_USERNAME/bank-saving-system.git
+git clone https://gitlab.com/hilmyha/bank-saving-system.git
 cd bank-saving-system
 ```
 
@@ -134,15 +134,23 @@ bank-saving-system/
 │   └── swagger.js       # API docs config
 ├── frontend/
 │   └── src/
-│       ├── services/    # API layer (M)
-│       ├── hooks/       # State logic (C)
-│       ├── components/  # UI components (V)
-│       ├── pages/       # Page views
+│       ├── services/    # API layer (Model)
+│       ├── hooks/       # Custom hooks (Controller)
+│       │   ├── useDashboard.js
+│       │   ├── useCustomers.js
+│       │   ├── useAccounts.js
+│       │   ├── useAccountDetail.js
+│       │   ├── useCustomerDetail.js
+│       │   └── useDepositoTypes.js
+│       ├── components/  # UI components (View)
+│       ├── pages/       # Page views (View)
 │       └── utils/       # Utilities
 ├── docs/                # Documentation
 │   ├── SYSTEM_SPECIFICATION.md
 │   ├── DATABASE_DESIGN.md
 │   ├── API_DOCUMENTATION.md
+│   ├── SCREEN_API_MAPPING.md
+│   ├── USER_JOURNEY.md
 │   ├── UML_DIAGRAMS.md
 │   └── ERROR_HANDLING.md
 └── postman/             # API collection
@@ -153,6 +161,8 @@ bank-saving-system/
 - [System Specification](docs/SYSTEM_SPECIFICATION.md)
 - [Database Design](docs/DATABASE_DESIGN.md)
 - [API Documentation](docs/API_DOCUMENTATION.md)
+- [Screen → API Mapping](docs/SCREEN_API_MAPPING.md)
+- [User Journey & Wireframes](docs/USER_JOURNEY.md)
 - [UML Diagrams](docs/UML_DIAGRAMS.md)
 - [Error Handling](docs/ERROR_HANDLING.md)
 

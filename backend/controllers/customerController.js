@@ -9,12 +9,52 @@ const Customer = require('../models/Customer');
  *       properties:
  *         id:
  *           type: string
+ *           format: uuid
+ *           example: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
  *         name:
  *           type: string
+ *           example: "John Doe"
  *         created_at:
  *           type: string
+ *           format: date-time
+ *           example: "2026-04-23T10:00:00.000Z"
  *         updated_at:
  *           type: string
+ *           format: date-time
+ *           example: "2026-04-23T10:00:00.000Z"
+ *     CustomerWithAccounts:
+ *       allOf:
+ *         - $ref: '#/components/schemas/Customer'
+ *         - type: object
+ *           properties:
+ *             accounts:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                   deposito_type_name:
+ *                     type: string
+ *                   yearly_return:
+ *                     type: number
+ *                   balance:
+ *                     type: number
+ *     SuccessResponse:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: true
+ *     ErrorResponse:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: false
+ *         error:
+ *           type: string
+ *           example: "Error message"
  */
 
 /**
@@ -22,10 +62,23 @@ const Customer = require('../models/Customer');
  * /api/customers:
  *   get:
  *     summary: Get all customers
+ *     description: Returns a list of all customers sorted by creation date (newest first).
  *     tags: [Customers]
  *     responses:
  *       200:
- *         description: List of customers
+ *         description: List of customers retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Customer'
  */
 exports.getAll = (req, res, next) => {
   try {
@@ -41,6 +94,7 @@ exports.getAll = (req, res, next) => {
  * /api/customers/{id}:
  *   get:
  *     summary: Get a customer by ID
+ *     description: Returns a single customer with all their associated accounts.
  *     tags: [Customers]
  *     parameters:
  *       - in: path
@@ -48,11 +102,25 @@ exports.getAll = (req, res, next) => {
  *         required: true
  *         schema:
  *           type: string
+ *         description: Customer UUID
  *     responses:
  *       200:
  *         description: Customer found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   $ref: '#/components/schemas/CustomerWithAccounts'
  *       404:
  *         description: Customer not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 exports.getById = (req, res, next) => {
   try {
@@ -71,6 +139,7 @@ exports.getById = (req, res, next) => {
  * /api/customers:
  *   post:
  *     summary: Create a new customer
+ *     description: Creates a new customer with the given name. Name must be non-empty and less than 100 characters.
  *     tags: [Customers]
  *     requestBody:
  *       required: true
@@ -82,11 +151,27 @@ exports.getById = (req, res, next) => {
  *             properties:
  *               name:
  *                 type: string
+ *                 example: "John Doe"
+ *                 maxLength: 100
  *     responses:
  *       201:
- *         description: Customer created
+ *         description: Customer created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   $ref: '#/components/schemas/CustomerWithAccounts'
  *       400:
- *         description: Validation error
+ *         description: Validation error (name missing or too long)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 exports.create = (req, res, next) => {
   try {
@@ -109,6 +194,7 @@ exports.create = (req, res, next) => {
  * /api/customers/{id}:
  *   put:
  *     summary: Update a customer
+ *     description: Updates the name of an existing customer.
  *     tags: [Customers]
  *     parameters:
  *       - in: path
@@ -116,6 +202,7 @@ exports.create = (req, res, next) => {
  *         required: true
  *         schema:
  *           type: string
+ *         description: Customer UUID
  *     requestBody:
  *       required: true
  *       content:
@@ -126,9 +213,22 @@ exports.create = (req, res, next) => {
  *             properties:
  *               name:
  *                 type: string
+ *                 example: "Jane Doe"
+ *                 maxLength: 100
  *     responses:
  *       200:
- *         description: Customer updated
+ *         description: Customer updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   $ref: '#/components/schemas/CustomerWithAccounts'
+ *       400:
+ *         description: Validation error
  *       404:
  *         description: Customer not found
  */
@@ -156,6 +256,7 @@ exports.update = (req, res, next) => {
  * /api/customers/{id}:
  *   delete:
  *     summary: Delete a customer
+ *     description: Deletes a customer. Will fail with 409 if the customer has active accounts.
  *     tags: [Customers]
  *     parameters:
  *       - in: path
@@ -163,13 +264,29 @@ exports.update = (req, res, next) => {
  *         required: true
  *         schema:
  *           type: string
+ *         description: Customer UUID
  *     responses:
  *       200:
- *         description: Customer deleted
+ *         description: Customer deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Customer deleted successfully"
  *       404:
  *         description: Customer not found
  *       409:
- *         description: Customer has active accounts
+ *         description: Customer has active accounts and cannot be deleted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 exports.delete = (req, res, next) => {
   try {

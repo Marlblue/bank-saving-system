@@ -1,107 +1,38 @@
-import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import accountService from '../services/accountService';
-import customerService from '../services/customerService';
-import depositoTypeService from '../services/depositoTypeService';
 import { useToast } from '../components/common/Toast';
 import Modal from '../components/common/Modal';
 import ConfirmDialog from '../components/common/ConfirmDialog';
 import { formatCurrency, formatDateTime } from '../utils/formatters';
 import { HiPlus, HiPencil, HiTrash, HiEye } from 'react-icons/hi';
+import useAccounts from '../hooks/useAccounts';
 
 export default function Accounts() {
-  const [accounts, setAccounts] = useState([]);
-  const [customers, setCustomers] = useState([]);
-  const [depositoTypes, setDepositoTypes] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editing, setEditing] = useState(null);
-  const [formCustomerId, setFormCustomerId] = useState('');
-  const [formDepositoTypeId, setFormDepositoTypeId] = useState('');
-  const [saving, setSaving] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState(null);
-  const [deleting, setDeleting] = useState(false);
-  const [search, setSearch] = useState('');
   const toast = useToast();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
-    try {
-      const [accRes, custRes, dtRes] = await Promise.all([
-        accountService.getAll(),
-        customerService.getAll(),
-        depositoTypeService.getAll(),
-      ]);
-      setAccounts(accRes.data);
-      setCustomers(custRes.data);
-      setDepositoTypes(dtRes.data);
-    } catch (err) {
-      toast(err.message, 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const openCreateModal = () => {
-    setEditing(null);
-    setFormCustomerId('');
-    setFormDepositoTypeId('');
-    setModalOpen(true);
-  };
-
-  const openEditModal = (account) => {
-    setEditing(account);
-    setFormCustomerId(account.customer_id);
-    setFormDepositoTypeId(account.deposito_type_id);
-    setModalOpen(true);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!editing && !formCustomerId) { toast('Please select a customer', 'error'); return; }
-    if (!formDepositoTypeId) { toast('Please select a deposito type', 'error'); return; }
-
-    setSaving(true);
-    try {
-      if (editing) {
-        await accountService.update(editing.id, { deposito_type_id: formDepositoTypeId });
-        toast('Account updated successfully', 'success');
-      } else {
-        await accountService.create({ customer_id: formCustomerId, deposito_type_id: formDepositoTypeId });
-        toast('Account created successfully', 'success');
-      }
-      setModalOpen(false);
-      loadData();
-    } catch (err) {
-      toast(err.message, 'error');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!deleteTarget) return;
-    setDeleting(true);
-    try {
-      await accountService.delete(deleteTarget.id);
-      toast('Account deleted successfully', 'success');
-      setDeleteTarget(null);
-      loadData();
-    } catch (err) {
-      toast(err.message, 'error');
-    } finally {
-      setDeleting(false);
-    }
-  };
-
-  const filtered = accounts.filter((a) =>
-    a.customer_name.toLowerCase().includes(search.toLowerCase()) ||
-    a.deposito_type_name.toLowerCase().includes(search.toLowerCase())
-  );
+  const {
+    accounts,
+    customers,
+    depositoTypes,
+    filtered,
+    loading,
+    search,
+    setSearch,
+    modalOpen,
+    editing,
+    formCustomerId,
+    setFormCustomerId,
+    formDepositoTypeId,
+    setFormDepositoTypeId,
+    saving,
+    deleteTarget,
+    setDeleteTarget,
+    deleting,
+    openCreateModal,
+    openEditModal,
+    closeModal,
+    handleSubmit,
+    handleDelete,
+  } = useAccounts(toast);
 
   if (loading) {
     return <div className="loading-spinner"><div className="spinner"></div></div>;
@@ -192,11 +123,11 @@ export default function Accounts() {
       {/* Create/Edit Modal */}
       <Modal
         isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
+        onClose={closeModal}
         title={editing ? 'Edit Account' : 'Create Account'}
         footer={
           <>
-            <button className="btn btn-secondary" onClick={() => setModalOpen(false)} disabled={saving}>Cancel</button>
+            <button className="btn btn-secondary" onClick={closeModal} disabled={saving}>Cancel</button>
             <button className="btn btn-primary" onClick={handleSubmit} disabled={saving}>
               {saving ? 'Saving...' : editing ? 'Update' : 'Create'}
             </button>

@@ -1,32 +1,14 @@
-import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import customerService from '../services/customerService';
 import { useToast } from '../components/common/Toast';
+import useCustomerDetail from '../hooks/useCustomerDetail';
 import { formatCurrency, formatDateTime } from '../utils/formatters';
 import { HiArrowLeft, HiCreditCard } from 'react-icons/hi';
 
 export default function CustomerDetail() {
   const { id } = useParams();
-  const [customer, setCustomer] = useState(null);
-  const [loading, setLoading] = useState(true);
   const toast = useToast();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    loadCustomer();
-  }, [id]);
-
-  const loadCustomer = async () => {
-    try {
-      const res = await customerService.getById(id);
-      setCustomer(res.data);
-    } catch (err) {
-      toast(err.message, 'error');
-      navigate('/customers');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { customer, loading } = useCustomerDetail(id, toast, navigate);
 
   if (loading) {
     return <div className="loading-spinner"><div className="spinner"></div></div>;

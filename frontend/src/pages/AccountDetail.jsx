@@ -1,98 +1,38 @@
-import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import accountService from '../services/accountService';
 import { useToast } from '../components/common/Toast';
 import Modal from '../components/common/Modal';
-import { formatCurrency, formatDate, formatDateTime } from '../utils/formatters';
+import useAccountDetail from '../hooks/useAccountDetail';
+import { formatCurrency, formatDate } from '../utils/formatters';
 import { HiArrowLeft, HiPlus, HiMinus, HiCash } from 'react-icons/hi';
 
 export default function AccountDetail() {
   const { id } = useParams();
-  const [account, setAccount] = useState(null);
-  const [transactions, setTransactions] = useState([]);
-  const [loading, setLoading] = useState(true);
   const toast = useToast();
   const navigate = useNavigate();
-
-  // Deposit state
-  const [depositOpen, setDepositOpen] = useState(false);
-  const [depositAmount, setDepositAmount] = useState('');
-  const [depositDate, setDepositDate] = useState(new Date().toISOString().split('T')[0]);
-  const [depositing, setDepositing] = useState(false);
-
-  // Withdraw state
-  const [withdrawOpen, setWithdrawOpen] = useState(false);
-  const [withdrawAmount, setWithdrawAmount] = useState('');
-  const [withdrawDate, setWithdrawDate] = useState(new Date().toISOString().split('T')[0]);
-  const [withdrawing, setWithdrawing] = useState(false);
-  const [withdrawResult, setWithdrawResult] = useState(null);
-
-  useEffect(() => {
-    loadAccount();
-  }, [id]);
-
-  const loadAccount = async () => {
-    try {
-      const [accRes, txnRes] = await Promise.all([
-        accountService.getById(id),
-        accountService.getTransactions(id),
-      ]);
-      setAccount(accRes.data);
-      setTransactions(txnRes.data);
-    } catch (err) {
-      toast(err.message, 'error');
-      navigate('/accounts');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDeposit = async (e) => {
-    e.preventDefault();
-    if (!depositAmount || parseFloat(depositAmount) <= 0) {
-      toast('Amount must be a positive number', 'error'); return;
-    }
-    if (!depositDate) { toast('Please select a date', 'error'); return; }
-
-    setDepositing(true);
-    try {
-      const res = await accountService.deposit(id, {
-        amount: parseFloat(depositAmount),
-        transaction_date: depositDate,
-      });
-      toast(`Deposit successful! New balance: ${formatCurrency(res.data.new_balance)}`, 'success');
-      setDepositOpen(false);
-      setDepositAmount('');
-      loadAccount();
-    } catch (err) {
-      toast(err.message, 'error');
-    } finally {
-      setDepositing(false);
-    }
-  };
-
-  const handleWithdraw = async (e) => {
-    e.preventDefault();
-    if (!withdrawAmount || parseFloat(withdrawAmount) <= 0) {
-      toast('Amount must be a positive number', 'error'); return;
-    }
-    if (!withdrawDate) { toast('Please select a date', 'error'); return; }
-
-    setWithdrawing(true);
-    try {
-      const res = await accountService.withdraw(id, {
-        amount: parseFloat(withdrawAmount),
-        transaction_date: withdrawDate,
-      });
-      setWithdrawResult(res.data.calculation);
-      toast('Withdrawal successful!', 'success');
-      loadAccount();
-    } catch (err) {
-      toast(err.message, 'error');
-    } finally {
-      setWithdrawing(false);
-    }
-  };
+  const {
+    account,
+    transactions,
+    loading,
+    depositOpen,
+    depositAmount,
+    setDepositAmount,
+    depositDate,
+    setDepositDate,
+    depositing,
+    openDeposit,
+    closeDeposit,
+    handleDeposit,
+    withdrawOpen,
+    withdrawAmount,
+    setWithdrawAmount,
+    withdrawDate,
+    setWithdrawDate,
+    withdrawing,
+    withdrawResult,
+    openWithdraw,
+    closeWithdraw,
+    handleWithdraw,
+  } = useAccountDetail(id, toast, navigate);
 
   if (loading) {
     return <div className="loading-spinner"><div className="spinner"></div></div>;
@@ -114,12 +54,12 @@ export default function AccountDetail() {
           </div>
         </div>
         <div className="btn-group">
-          <button className="btn btn-primary" onClick={() => { setDepositOpen(true); setDepositAmount(''); }} id="btn-deposit">
+          <button className="btn btn-primary" onClick={openDeposit} id="btn-deposit">
             <HiPlus /> Deposit
           </button>
           <button
             className="btn btn-secondary"
-            onClick={() => { setWithdrawOpen(true); setWithdrawAmount(''); setWithdrawResult(null); }}
+            onClick={openWithdraw}
             disabled={account.balance <= 0}
             id="btn-withdraw"
           >
@@ -221,11 +161,11 @@ export default function AccountDetail() {
       {/* Deposit Modal */}
       <Modal
         isOpen={depositOpen}
-        onClose={() => setDepositOpen(false)}
+        onClose={closeDeposit}
         title="Deposit Money"
         footer={
           <>
-            <button className="btn btn-secondary" onClick={() => setDepositOpen(false)} disabled={depositing}>Cancel</button>
+            <button className="btn btn-secondary" onClick={closeDeposit} disabled={depositing}>Cancel</button>
             <button className="btn btn-primary" onClick={handleDeposit} disabled={depositing}>
               {depositing ? 'Processing...' : 'Deposit'}
             </button>
@@ -268,18 +208,18 @@ export default function AccountDetail() {
       {/* Withdraw Modal */}
       <Modal
         isOpen={withdrawOpen}
-        onClose={() => { setWithdrawOpen(false); setWithdrawResult(null); }}
+        onClose={closeWithdraw}
         title="Withdraw Money"
         footer={
           !withdrawResult ? (
             <>
-              <button className="btn btn-secondary" onClick={() => setWithdrawOpen(false)} disabled={withdrawing}>Cancel</button>
+              <button className="btn btn-secondary" onClick={closeWithdraw} disabled={withdrawing}>Cancel</button>
               <button className="btn btn-danger" onClick={handleWithdraw} disabled={withdrawing}>
                 {withdrawing ? 'Processing...' : 'Withdraw'}
               </button>
             </>
           ) : (
-            <button className="btn btn-primary" onClick={() => { setWithdrawOpen(false); setWithdrawResult(null); }}>
+            <button className="btn btn-primary" onClick={closeWithdraw}>
               Done
             </button>
           )
