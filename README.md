@@ -47,7 +47,7 @@ Frontend MVC:
 
 ### 1. Clone the repository
 ```bash
-git clone https://gitlab.com/hilmyha/bank-saving-system.git
+git clone https://github.com/Marlblue/bank-saving-system.git
 cd bank-saving-system
 ```
 
@@ -165,6 +165,7 @@ bank-saving-system/
 - [User Journey & Wireframes](docs/USER_JOURNEY.md)
 - [UML Diagrams](docs/UML_DIAGRAMS.md)
 - [Error Handling](docs/ERROR_HANDLING.md)
+- [Deployment Guide (Railway + Cloudflare)](docs/DEPLOYMENT.md)
 
 ## 🧪 Testing with Postman
 

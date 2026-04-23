@@ -7,11 +7,11 @@ WORKDIR /app
 
 # --- Install backend dependencies ---
 COPY backend/package.json backend/package-lock.json ./backend/
-RUN cd backend && npm ci --only=production
+RUN cd backend && npm install --only=production
 
 # --- Install frontend dependencies & build ---
 COPY frontend/package.json frontend/package-lock.json ./frontend/
-RUN cd frontend && npm ci
+RUN cd frontend && npm install
 
 COPY frontend/ ./frontend/
 RUN cd frontend && VITE_API_URL=/api npm run build
