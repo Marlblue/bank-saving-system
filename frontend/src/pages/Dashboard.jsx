@@ -35,9 +35,11 @@ export default function Dashboard() {
         </div>
         <div className="stat-card">
           <div className="stat-icon amber"><HiCash size={24} /></div>
-          <div className="stat-info">
+          <div className="stat-info" style={{ overflow: 'hidden' }}>
             <h3>Total Balance</h3>
-            <div className="stat-value" style={{ fontSize: '1.25rem' }}>{formatCurrency(stats?.total_balance)}</div>
+            <div className="stat-value" style={{ fontSize: 'clamp(1rem, 5vw, 1.5rem)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {formatCurrency(stats?.total_balance)}
+            </div>
           </div>
         </div>
         <div className="stat-card" onClick={() => navigate('/deposito-types')} style={{ cursor: 'pointer' }}>
@@ -53,6 +55,9 @@ export default function Dashboard() {
       <div className="table-container">
         <div className="table-header">
           <h3 className="table-title">Recent Transactions</h3>
+          <span className="mobile-only" style={{ fontSize: 'var(--font-size-xs)', color: 'var(--text-muted)' }}>
+            Swipe left to see more →
+          </span>
         </div>
         <div className="table-wrapper">
           {stats?.recent_transactions?.length > 0 ? (

@@ -58,9 +58,12 @@ export default function Accounts() {
             placeholder="Search by customer or deposito type..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            style={{ maxWidth: 350 }}
+            style={{ maxWidth: '100%', width: '350px' }}
             id="search-accounts"
           />
+          <span className="mobile-only" style={{ fontSize: 'var(--font-size-xs)', color: 'var(--text-muted)' }}>
+            Swipe left to see more →
+          </span>
         </div>
         <div className="table-wrapper">
           {filtered.length > 0 ? (

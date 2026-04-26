@@ -1,6 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { HiHome, HiUsers, HiCreditCard, HiCollection, HiMenu, HiX } from 'react-icons/hi';
-import { useState } from 'react';
+import { HiHome, HiUsers, HiCreditCard, HiCollection, HiX } from 'react-icons/hi';
 
 const navItems = [
   { label: 'Dashboard', path: '/', icon: <HiHome /> },
@@ -9,60 +8,39 @@ const navItems = [
   { label: 'Deposito Types', path: '/deposito-types', icon: <HiCollection /> },
 ];
 
-export default function Sidebar() {
-  const [mobileOpen, setMobileOpen] = useState(false);
-
+export default function Sidebar({ isOpen, onClose }) {
   return (
     <>
-      {/* Mobile menu button */}
-      {!mobileOpen && (
-        <button
-          className="btn btn-ghost btn-icon"
-          onClick={() => setMobileOpen(true)}
-          style={{
-            position: 'fixed',
-            top: '17px',
-            left: '16px',
-            zIndex: 200,
-            display: 'none',
-          }}
-          id="mobile-menu-btn"
-          aria-label="Open menu"
-        >
-          <HiMenu size={24} />
-        </button>
-      )}
-
       {/* Overlay for mobile */}
-      {mobileOpen && (
+      {isOpen && (
         <div
+          className="mobile-only"
           style={{
             position: 'fixed',
             inset: 0,
-            background: 'rgba(0,0,0,0.5)',
+            background: 'rgba(0,0,0,0.6)',
+            backdropFilter: 'blur(4px)',
             zIndex: 99,
           }}
-          onClick={() => setMobileOpen(false)}
+          onClick={onClose}
         />
       )}
 
-      <aside className={`sidebar ${mobileOpen ? 'open' : ''}`}>
+      <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
         <div className="sidebar-logo">
           <div className="sidebar-logo-icon">🏦</div>
           <h1 style={{ flex: 1 }}>
             BankSave
             <span>Saving System</span>
           </h1>
-          {mobileOpen && (
-            <button
-              className="btn btn-ghost btn-icon"
-              onClick={() => setMobileOpen(false)}
-              style={{ marginLeft: 'auto' }}
-              aria-label="Close menu"
-            >
-              <HiX size={20} />
-            </button>
-          )}
+          <button
+            className="btn btn-ghost btn-icon mobile-only"
+            onClick={onClose}
+            style={{ marginLeft: 'auto' }}
+            aria-label="Close menu"
+          >
+            <HiX size={20} />
+          </button>
         </div>
 
         <nav className="sidebar-nav">
@@ -73,7 +51,7 @@ export default function Sidebar() {
               to={item.path}
               end={item.path === '/'}
               className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
-              onClick={() => setMobileOpen(false)}
+              onClick={onClose}
             >
               <span className="sidebar-icon">{item.icon}</span>
               {item.label}
@@ -87,12 +65,6 @@ export default function Sidebar() {
           </div>
         </div>
       </aside>
-
-      <style>{`
-        @media (max-width: 768px) {
-          #mobile-menu-btn { display: flex !important; }
-        }
-      `}</style>
     </>
   );
 }

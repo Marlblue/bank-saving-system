@@ -54,9 +54,12 @@ export default function Customers() {
             placeholder="Search customers..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            style={{ maxWidth: 300 }}
+            style={{ maxWidth: '100%', width: '300px' }}
             id="search-customers"
           />
+          <span className="mobile-only" style={{ fontSize: 'var(--font-size-xs)', color: 'var(--text-muted)' }}>
+            Swipe left to see more →
+          </span>
         </div>
         <div className="table-wrapper">
           {filtered.length > 0 ? (
