@@ -15,21 +15,23 @@ export default function Sidebar() {
   return (
     <>
       {/* Mobile menu button */}
-      <button
-        className="btn btn-ghost btn-icon"
-        onClick={() => setMobileOpen(true)}
-        style={{
-          position: 'fixed',
-          top: '18px',
-          left: '16px',
-          zIndex: 200,
-          display: 'none',
-        }}
-        id="mobile-menu-btn"
-        aria-label="Open menu"
-      >
-        <HiMenu size={24} />
-      </button>
+      {!mobileOpen && (
+        <button
+          className="btn btn-ghost btn-icon"
+          onClick={() => setMobileOpen(true)}
+          style={{
+            position: 'fixed',
+            top: '17px',
+            left: '16px',
+            zIndex: 200,
+            display: 'none',
+          }}
+          id="mobile-menu-btn"
+          aria-label="Open menu"
+        >
+          <HiMenu size={24} />
+        </button>
+      )}
 
       {/* Overlay for mobile */}
       {mobileOpen && (
@@ -47,7 +49,7 @@ export default function Sidebar() {
       <aside className={`sidebar ${mobileOpen ? 'open' : ''}`}>
         <div className="sidebar-logo">
           <div className="sidebar-logo-icon">🏦</div>
-          <h1>
+          <h1 style={{ flex: 1 }}>
             BankSave
             <span>Saving System</span>
           </h1>

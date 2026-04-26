@@ -179,7 +179,7 @@ a:hover {
   padding: var(--space-lg);
   display: flex;
   align-items: center;
-  gap: var(--space-md);
+  gap: var(--space-lg);
   border-bottom: 1px solid var(--border-color);
 }
 
@@ -203,7 +203,8 @@ a:hover {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  line-height: 1.2;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
 }
 
 .sidebar-logo span {
@@ -891,7 +892,7 @@ tbody tr:hover {
 
   .header {
     left: 0;
-    padding: 0 var(--space-md);
+    padding: 0 var(--space-md) 0 64px;
   }
 
   .stat-cards {
